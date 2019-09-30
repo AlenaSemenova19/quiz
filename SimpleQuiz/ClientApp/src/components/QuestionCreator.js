@@ -13,10 +13,20 @@ export class QuestionCreator extends Component {
             AllAnswers.push(obj);
         }
 
-        var request = new XMLHttpRequest();
-        request.open('POST', '/api/QuizData/AddQuestion', true);
-        request.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
-        request.send(AllAnswers);
+        var Request =
+        {
+            Question: OneQiestion,
+            Answers: AllAnswers
+        };
+
+        fetch('https://localhost:44392/api/QuizData/AddQuestion', {
+            method: 'POST',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(Request),
+        });
 
     }
 
@@ -30,7 +40,7 @@ export class QuestionCreator extends Component {
                 <form>
                     <div>
                         <label for="name">Your Question: </label>
-                        <input type="text" size="40" id="questionId" required />
+                        <input type="text" size="40" id="questionId" />
                     </div>
                     &nbsp;
                     <div>

@@ -28,7 +28,11 @@ namespace SimpleQuiz
             services.AddMvc();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
-
+            services.AddMvc()
+        .AddJsonOptions(options =>
+        {
+            options.SerializerSettings.ContractResolver = new Newtonsoft.Json.Serialization.CamelCasePropertyNamesContractResolver();
+        });
             // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
             {

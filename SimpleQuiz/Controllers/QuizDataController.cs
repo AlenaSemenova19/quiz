@@ -22,37 +22,38 @@ namespace SimpleQuiz.Controllers
             db = context;
         }
 
-        private void Validation(string OneQuestion, List<InputAnswer> AllAnswers)
+        private void Validation(CreateRequest Request)
         {
-            if (String.IsNullOrEmpty(OneQuestion))
+            if (String.IsNullOrEmpty(Request.Question))
             {
-                throw new Exception("OneQuestion cannot be null or empty");
+                throw new Exception("Question cannot be null or empty");
             }
 
-            if (AllAnswers.Count < 1)
+            if (Request.Answers.Count() < 1)
             {
-                throw new Exception("AllAnswers cannot be empty");
+                throw new Exception("Answers cannot be empty");
             }
         }
 
         [HttpPost("[action]")]
-        public void AddQuestion(string OneQuestion, List<InputAnswer> AllAnswers)
+        public void AddQuestion([FromBody]CreateRequest Request)
         {
-            Validation(OneQuestion, AllAnswers);
+            Validation(Request);
             var que = new Question()
             {
-                Text = OneQuestion
+                Text = Request.Question
             };
 
             var Answers = new List<Answer>();
-            var ans = AllAnswers.Select(x => Mapper.ToModel(x));
+            var ans = Request.Answers.Select(x => Mapper.ToModel(x));
             Answers.AddRange(ans);
+            que.AnswersId = new List<Answer>();
             que.AnswersId.AddRange(Answers);
             db.Questions.Add(que);
             db.SaveChanges();
         }
         [HttpPost("[action]")]
-        public void test(string test)
+        public void test(InputAnswer test)
         {
             var a = test;
         }
