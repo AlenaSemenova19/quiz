@@ -1,11 +1,25 @@
 ﻿import React, { Component } from 'react';
+import {  Link } from 'react-router-dom';
 
 export class QuestionCreator extends Component {
-    displayName = QuestionCreator.name
-    createQuestion() {
-        var OneQiestion = document.getElementById("questionId").value;
-        var answerId = document.getElementsByClassName("answer");
-        var AllAnswers = [];
+    displayName = QuestionCreator.name;
+    constructor(props) {
+        super(props);
+        this.state = {
+            question: '',
+            answers: []
+        };
+
+        this.handleChange = this.handleChange.bind(this);
+        this.handleSubmit = this.handleSubmit.bind(this);
+    }
+
+    createQuestion(e) {
+        e.preventDefault();
+        console.log(e);
+        const OneQiestion = document.getElementById("questionId").value;
+        const answerId = document.getElementsByClassName("answer");
+        const AllAnswers = [];
         for (var i = 0; i < answerId.length; i++) {
             var answer = answerId[i].getElementsByClassName("valueAnswer")[0].value;
             var check = answerId[i].getElementsByClassName("checkAnswer")[0].checked;
@@ -33,25 +47,41 @@ export class QuestionCreator extends Component {
     render() {
 
         return (
-            <div class="form-wrap">
-                <div class="question">
+            <div className="form-wrap">
+                <div className="question">
+                    <Link to="/">Back</Link> 
                     <h1>Create Question</h1>
                 </div>
-                <form>
+
+                <form onSubmit={this.createQuestion}>
                     <div>
-                        <label for="name">Your Question: </label>
-                        <input type="text" size="40" id="questionId" />
+                        <label htmlFor="name">Your Question: </label>
+                        <input type="text" size="40" id="questionId" value={thtis.state.question}/>
                     </div>
                     &nbsp;
                     <div>
                         <ul>
-                            <p><li><div class="answer"><input class="valueAnswer" type="text" /><input class="checkAnswer" type="checkbox" /></div></li></p>
-                            <p><li><div class="answer"><input class="valueAnswer" type="text" /><input class="checkAnswer" type="checkbox" /></div></li></p>
-                            <p><li><div class="answer"><input class="valueAnswer" type="text" /><input class="checkAnswer" type="checkbox" /></div></li></p>
-                            <p><li><div class="answer"><input class="valueAnswer" type="text" /><input class="checkAnswer" type="checkbox" /></div></li></p>
+                            <p>
+                                <li>
+                                    <div className="answer">
+                                        <input className="valueAnswer" type="text" value={this.state.value} />
+                                        <input className="checkAnswer" type="checkbox" />
+                                    </div>
+                                </li>
+                            </p>
+                            <p>
+                                <li>
+                                    <div className="answer">
+                                        <input className="valueAnswer" type="text" />
+                                        <input className="checkAnswer" type="checkbox" />
+                                    </div>
+                                </li>
+                            </p>
+                            <p><li><div className="answer"><input className="valueAnswer" type="text" /><input className="checkAnswer" type="checkbox" /></div></li></p>
+                            <p><li><div className="answer"><input className="valueAnswer" type="text" /><input className="checkAnswer" type="checkbox" /></div></li></p>
                         </ul>
 
-                        <button onClick={this.createQuestion} type="submit">Create</button> 
+                        <button>Create</button> 
                     </div>
                 </form> 
             </div>

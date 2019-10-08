@@ -16,7 +16,7 @@ namespace SimpleQuiz.Controllers
     public class QuizDataController : ControllerBase
     {
         private readonly Database db;
-        
+
         public QuizDataController(Database context)
         {
             db = context;
@@ -52,26 +52,25 @@ namespace SimpleQuiz.Controllers
             db.Questions.Add(que);
             db.SaveChanges();
         }
-        [HttpPost("[action]")]
-        public void test(InputAnswer test)
-        {
-            var a = test;
-        }
 
-        public List<OutputQuestion> GetQuestions()
+        [HttpGet("[action]")]
+        public OutputQuestion GetQuestions(int numberOfQuestion)
         {
-            var dbase = db.Questions.Include("Answer");
-
-            var result = new List<OutputQuestion>();
-            foreach (var q in dbase)
+            var data = db.Questions.Include(x => x.AnswersId).SingleOrDefault(x => x.Id == numberOfQuestion);
+            if (data == null)
             {
-                var que = new OutputQuestion();
-                que.Text = q.Text;
-
-                var ans =  q.AnswersId.Select(x => Mapper.ToModel(x));
-                que.AllAnswers.AddRange(ans);
-                result.Add(que);
+                return null;
             }
+
+            var result = new OutputQuestion
+            {
+                Text = data.Text,
+                AllAnswers = new List<OutputAnswer>()
+            };
+
+            var ans = data.AnswersId.Select(x => Mapper.ToModel(x));
+
+            result.AllAnswers.AddRange(ans);
 
             return result;
         }

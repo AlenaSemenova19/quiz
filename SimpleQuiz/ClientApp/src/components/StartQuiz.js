@@ -1,55 +1,118 @@
 ﻿import React from 'react';
-import ReactDOM from 'react-dom';
 
 export class StartQuiz extends React.Component {
-    displayName = StartQuiz.name
+    displayName = StartQuiz.name;
+
+    constructor(props) {
+        super(props)
+        this.state = {
+            question: "",
+            isFetching: true,
+            data:[],
+            numberOfQuestion: 3,
+            points: 0
+
+        };
+
+    }
+
+    componentDidMount()
+    {
+        fetch('https://localhost:44392/api/QuizData/GetQuestions?numberOfQuestion=' + this.state.numberOfQuestion)
+            .then(response => response.json())
+            .then(result => {
+                if (result == null)
+                {
+                    alert('END your points: ' + this.state.points);
+
+                }
+                var VariableQuestion = result.text;
+
+                this.setState({
+                    question: VariableQuestion,
+                    isFetching: false,
+                    data: result.allAnswers,
+                    numberOfQuestion: this.state.numberOfQuestion + 1
+                });
+            });
+
+    }
+
+    NextQuestion = () => {
+        var allAnswers = document.getElementsByClassName("classSelectAnswer");
+        var data = this.state.data;
+        var wrongAnswer = false;
+        for (var i = 0; i < allAnswers.length; i++) {
+            var text = allAnswers[i].getElementsByClassName("id_label")[0].firstChild.data;
+            var result = allAnswers[i].getElementsByClassName("result")[0].checked;
+
+            for (var y = 0; y < data.length; y++)
+            {
+                var textOfAnswer = data[y];
+
+                if (textOfAnswer.text == text && textOfAnswer.rightAnswer != result) {
+                    alert('it is wrong answer!');
+                    wrongAnswer = true;
+                    break;
+                }
+            }
+            if (wrongAnswer) {
+                break;
+            }
+
+        }
+        if (!wrongAnswer) {
+            alert('Right answer!');
+            this.setState({
+                points: this.state.points + 1
+            });
+        }
+       
+        this.setState({
+            numberOfQuestion: this.state.numberOfQuestion + 1
+        });
+        this.componentDidMount();
+    }
+
+    //toggleCheckbox()
+    //{
+    //    var text = '';
+    //    var a = document.getElementsByClassName("id_label");
+    //    for (var i = 0; i > a.length; i++)
+    //    {
+    //        text = a[i].innerHTML;
+    //    }
+    //    console.log(text);
+    //}
 
     render() {
-        const mystyle = {
-            color: 'black',
-            padding: '11rem',
-            fontFamily: 'cursive',
-            fontSize: '2rem',
-            textAlign: 'center',
-        };
+        const { question, isFetching} = this.state;
 
-        const buttonStyle = {
-            float: 'right',
-        };
+        if (isFetching) return <div>...Loading</div>;
 
         return (
             <div>
-                <div class="question" style={mystyle}>
-                    <span class="quesion_n">Площадь Белорусии составляет 4% от площади России, а площадь России от площади Белорусии...</span>
-                </div>
-
-                <table border="1" width="100%" cellpadding="5">
-                    <tr>
-                        <th>
-                            <input type="radio" />
-                            <label for="contactChoice1">Email</label>
-                        </th>
-                        <th>
-                            <input type="radio" />
-                            <label for="contactChoice1">Adress</label>
-                        </th>
-                    </tr>
-                    <tr>
-                        <td>
-                            <input type="radio" />
-                            <label for="contactChoice1">Go</label>
-                        </td>
-                        <td>
-                            <input type="radio" />
-                            <label for="contactChoice1">Email</label>
-                        </td>
-                    </tr>
-                </table>
-
-                <button style={buttonStyle}>Next</button>
+                <h1>{question}</h1>
+                {
+                    this.state.data.map((data) => {
+                        return (
+                            <div>
+                                <ul>
+                                    <p>
+                                        <li>
+                                            <div className="classSelectAnswer">
+                                                <input type="checkbox" className="result" />
+                                                <label className="id_label">{data.text}</label>
+                                            </div>
+                                        </li>
+                                    </p>
+                                </ul>
+                            </div>
+                        )
+                    })
+                }
+                <button onClick={this.NextQuestion}>Next</button> 
             </div>
-        );
+        )
     }
 }
-
-export default StartQuiz;
