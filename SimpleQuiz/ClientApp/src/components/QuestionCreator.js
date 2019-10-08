@@ -1,5 +1,5 @@
 ﻿import React, { Component } from 'react';
-import {  Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 export class QuestionCreator extends Component {
     displayName = QuestionCreator.name;
@@ -9,28 +9,21 @@ export class QuestionCreator extends Component {
             question: '',
             answers: []
         };
-
-        this.handleChange = this.handleChange.bind(this);
-        this.handleSubmit = this.handleSubmit.bind(this);
     }
 
     createQuestion(e) {
         e.preventDefault();
-        console.log(e);
-        const OneQiestion = document.getElementById("questionId").value;
-        const answerId = document.getElementsByClassName("answer");
-        const AllAnswers = [];
-        for (var i = 0; i < answerId.length; i++) {
-            var answer = answerId[i].getElementsByClassName("valueAnswer")[0].value;
-            var check = answerId[i].getElementsByClassName("checkAnswer")[0].checked;
-            var obj = { Text: answer, RightAnswer: check };
-            AllAnswers.push(obj);
-        }
-
+        
+        console.log(this.state);
         var Request =
         {
-            Question: OneQiestion,
-            Answers: AllAnswers
+            Question: this.state.question,
+            Answers: this.state.answers.map(answer => {
+                return {
+                    text: answer.text,
+                    rightAnswer: answer.isTrue
+                }
+            }) 
         };
 
         fetch('https://localhost:44392/api/QuizData/AddQuestion', {
@@ -44,46 +37,56 @@ export class QuestionCreator extends Component {
 
     }
 
+    answerChange = (type, value, index) => {
+        const answers = this.state.answers;
+        answers[index][type] = value;
+        this.setState({answers});
+    }
+
+    SaveQuestion = (event) => {
+        this.setState({
+            question: event.target.value
+        })
+    }
+
     render() {
 
         return (
             <div className="form-wrap">
                 <div className="question">
-                    <Link to="/">Back</Link> 
+                    <Link to="/">Back</Link>
                     <h1>Create Question</h1>
                 </div>
-
-                <form onSubmit={this.createQuestion}>
+                <button onClick={() => {
+                    const answers = this.state.answers;
+                    answers.push({
+                        text: '',
+                        isTrue: false
+                    });
+                    this.setState({ answers });
+                }}> add answer </button>
+                <form onSubmit={(e) => this.createQuestion(e)}>
                     <div>
                         <label htmlFor="name">Your Question: </label>
-                        <input type="text" size="40" id="questionId" value={thtis.state.question}/>
+                        <input type="text" size="40" id="questionId" value={this.state.question} onChange={this.SaveQuestion} />
                     </div>
                     &nbsp;
                     <div>
                         <ul>
-                            <p>
-                                <li>
-                                    <div className="answer">
-                                        <input className="valueAnswer" type="text" value={this.state.value} />
-                                        <input className="checkAnswer" type="checkbox" />
-                                    </div>
-                                </li>
-                            </p>
-                            <p>
-                                <li>
-                                    <div className="answer">
-                                        <input className="valueAnswer" type="text" />
-                                        <input className="checkAnswer" type="checkbox" />
-                                    </div>
-                                </li>
-                            </p>
-                            <p><li><div className="answer"><input className="valueAnswer" type="text" /><input className="checkAnswer" type="checkbox" /></div></li></p>
-                            <p><li><div className="answer"><input className="valueAnswer" type="text" /><input className="checkAnswer" type="checkbox" /></div></li></p>
+                            {this.state.answers.map((answer, index) => <li key={index}>
+                                <div className="answer">
+                                    <input className="valueAnswer"
+                                        type="text" value={answer.text} onChange={(e) => this.answerChange('text', e.target.value, index)} />
+                                    <input className="checkAnswer"
+                                        type="checkbox" value={answer.isTrue}
+                                        onChange={(e) => this.answerChange('isTrue', e.target.checked, index)} />
+                                </div>
+                            </li>)}
                         </ul>
 
-                        <button>Create</button> 
+                        <button>Create</button>
                     </div>
-                </form> 
+                </form>
             </div>
         );
     }
